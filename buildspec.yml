@@ -17,5 +17,6 @@ phases:
       - sed "s/\${STAGE}/$STAGE/g" ../appspec.yml > appspec-resolved.yml
 artifacts:
   files:
-    - appspec-resolved.yml
+    - appspec-resolved.yml   # Ensure the AppSpec file is included
     - patient_record_service.zip
+  discard-paths: yes          # Ensures files are placed in the root of the artifact
