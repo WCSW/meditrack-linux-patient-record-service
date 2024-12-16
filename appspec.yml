@@ -5,3 +5,4 @@ Resources:
       Properties:
         Name: patient-record-service-${STAGE}
         Alias: ${STAGE}
+        CurrentVersion: ${VERSION}

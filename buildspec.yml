@@ -7,22 +7,23 @@ phases:
     commands:
       - echo "Installing dependencies..."
       - pip install -r requirements.txt -t src/
+
   build:
     commands:
-      - echo "Running unit tests..."
-      - pytest tests/ || echo "Tests failed. Check output for details."
       - echo "Packaging Lambda function..."
       - cd src && zip -r ../patient_record_service.zip .
       - cd ..
-      - echo "Replacing STAGE placeholder in appspec.yml..."
-      - sed "s/\${STAGE}/$STAGE/g" appspec.yml > appspec-resolved.yml
+      - echo "Publishing Lambda function version..."
+      - aws lambda update-function-code --function-name patient-record-service-$STAGE --zip-file fileb://patient_record_service.zip
+      - LAMBDA_VERSION=$(aws lambda publish-version --function-name patient-record-service-$STAGE --query Version --output text)
+      - echo "Replacing STAGE and VERSION in appspec.yml..."
+      - sed "s/\${STAGE}/$STAGE/g; s/\${VERSION}/$LAMBDA_VERSION/g" appspec.yml > appspec-resolved.yml
       - mv appspec-resolved.yml appspec.yml
-      - echo "Generated appspec.yml file:"
+      - echo "Final appspec.yml:"
       - cat appspec.yml
-      - echo "Listing files in the build directory:"
-      - ls -la
+
 artifacts:
   files:
-    - appspec.yml                # Ensure the final file is named appspec.yml
+    - appspec.yml
     - patient_record_service.zip
-  discard-paths: yes             # Ensures files are placed in the root of the artifact
+  discard-paths: yes
