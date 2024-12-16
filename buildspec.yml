@@ -19,13 +19,14 @@ phases:
       - echo "STAGE value is: $STAGE"
       - echo "------------------------------------------"
       - echo "Replacing STAGE placeholder in appspec.yml..."
-      - sed "s/\${STAGE}/$STAGE/g" appspec.yml > appspec.yml
+      - sed "s/\${STAGE}/$STAGE/g" appspec.yml > appspec-resolved.yml
+      - mv appspec-resolved.yml appspec.yml
       - echo "Generated appspec.yml file:"
       - cat appspec.yml
       - echo "Listing files in the build directory:"
       - ls -la
 artifacts:
   files:
-    - appspec.yml   # Ensure the AppSpec file is included
+    - appspec.yml                # Ensure the final file is named appspec.yml
     - patient_record_service.zip
-  discard-paths: yes          # Ensures files are placed in the root of the artifact
+  discard-paths: yes             # Ensures files are placed in the root of the artifact
