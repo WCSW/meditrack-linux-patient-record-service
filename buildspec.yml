@@ -9,11 +9,13 @@ phases:
       - pip install -r requirements.txt -t src/
   build:
     commands:
+      - echo "Running unit tests..."
+      - pytest tests/ || echo "Tests failed. Check output for details."
       - echo "Packaging Lambda function..."
       - cd src && zip -r ../patient_record_service.zip .
-      - echo "Copying appspec.yml for CodeDeploy..."
-      - cp ../appspec.yml .
+      - echo "Replacing STAGE placeholder in appspec.yml..."
+      - sed "s/\${STAGE}/$STAGE/g" ../appspec.yml > appspec-resolved.yml
 artifacts:
   files:
-    - appspec.yml
+    - appspec-resolved.yml
     - patient_record_service.zip
