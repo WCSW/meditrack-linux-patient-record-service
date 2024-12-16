@@ -13,10 +13,19 @@ phases:
       - pytest tests/ || echo "Tests failed. Check output for details."
       - echo "Packaging Lambda function..."
       - cd src && zip -r ../patient_record_service.zip .
+      - cd ..
+      - echo "------------------------------------------"
+      - echo "DEBUG: Checking STAGE environment variable"
+      - echo "STAGE value is: $STAGE"
+      - echo "------------------------------------------"
       - echo "Replacing STAGE placeholder in appspec.yml..."
-      - sed "s/\${STAGE}/$STAGE/g" ../appspec.yml > appspec-resolved.yml
+      - sed "s/\${STAGE}/$STAGE/g" appspec.yml > appspec.yml
+      - echo "Generated appspec.yml file:"
+      - cat appspec.yml
+      - echo "Listing files in the build directory:"
+      - ls -la
 artifacts:
   files:
-    - appspec-resolved.yml   # Ensure the AppSpec file is included
+    - appspec.yml   # Ensure the AppSpec file is included
     - patient_record_service.zip
   discard-paths: yes          # Ensures files are placed in the root of the artifact
