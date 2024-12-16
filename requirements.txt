@@ -1,0 +1,2 @@
+boto3        # For AWS SDK
+flask        # For local API testing (not needed for Lambda deployment)
