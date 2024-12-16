@@ -1,0 +1,8 @@
+version: 0.0
+Resources:
+  - PatientRecordService:
+      Type: AWS::Lambda::Function
+      Properties:
+        Name: patient-record-service-${STAGE}   # Lambda function name
+        Alias: ${STAGE}                         # UAT or PROD alias
+        CurrentVersion: 1                       # Version (optional for first deployment)

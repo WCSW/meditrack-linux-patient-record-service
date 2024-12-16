@@ -1,0 +1,19 @@
+service: patient-record-service
+
+provider:
+  name: aws
+  runtime: python3.8  # Lambda runtime
+  region: us-east-1   # AWS region
+  environment:        # Environment variables for the function
+    STAGE: ${opt:stage, 'dev'}
+
+functions:
+  patientServiceHandler:
+    handler: src/patient_record_service.lambda_handler
+    events:
+      - http:
+          path: patient
+          method: any
+
+plugins:
+  - serverless-deployment-bucket  # Optional: To specify a custom S3 bucket for deployment
