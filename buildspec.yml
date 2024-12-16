@@ -14,8 +14,8 @@ phases:
       - echo "Packaging Lambda function..."
       - cd src && zip -r ../patient_record_service.zip .
       - echo "Replacing STAGE placeholder in appspec.yml..."
-      - sed "s/\${STAGE}/$STAGE/g" ../appspec.yml > appspec-resolved.yml
+      - sed "s/\${STAGE}/$STAGE/g" ../appspec.yml > appspec.yml
 artifacts:
   files:
-    - appspec-resolved.yml
+    - appspec.yml
     - patient_record_service.zip
