@@ -17,7 +17,7 @@ phases:
       - echo "Clearing NPM cache to avoid archive issues..."
       - npm cache clean --force
       - echo "Installing Serverless Framework..."
-      - npm install -g serverless@3.38.0
+      - npm install -g serverless
       - echo "Serverless Framework installed successfully!"
       - serverless --version
 
