@@ -2,7 +2,7 @@ version: 0.2
 
 env:
   variables:
-    SERVERLESS_ACCESS_KEY: "AKH0BPKbz2RQUgkNr4unbgVJqMJVCEtsq22E7ACnKVv8Z"
+    SERVERLESS_ACCESS_KEY: "AKH0BPKbz2RQUgkNr4unbgVJqMJVCEtsq22E7ACnKVv8K"
 
 phases:
   install:
@@ -10,18 +10,10 @@ phases:
       python: 3.11
       nodejs: 18
     commands:
-      - echo "============================================="
-      - echo "Verifying Node.js and npm versions:"
-      - node -v && npm -v
-      - echo "Clearing NPM cache..."
-      - npm cache clean --force
       - echo "Installing Serverless Framework..."
       - npm install -g serverless
       - echo "Installing required plugins..."
       - npm install serverless-deployment-bucket
-      - serverless --version
-      - echo "============================================="
-      - echo "Installing envsubst for placeholder replacement..."
       - yum install -y gettext
 
   build:
@@ -43,17 +35,12 @@ phases:
         fi
       - echo "Lambda version published - $LAMBDA_VERSION"
 
-      - echo "Verifying Lambda function version..."
-      - aws lambda list-versions-by-function --function-name patient-record-service-$STAGE
-      - echo "Adding delay to ensure version availability..."
-      - sleep 20
-
       - echo "Creating/Updating Lambda alias..."
       - aws lambda update-alias --function-name patient-record-service-$STAGE --name $STAGE --function-version $LAMBDA_VERSION || aws lambda create-alias --function-name patient-record-service-$STAGE --name $STAGE --function-version $LAMBDA_VERSION
       - echo "Lambda alias '$STAGE' updated to version - $LAMBDA_VERSION"
 
-      - echo "Adding delay before proceeding with AppSpec update..."
-      - sleep 20  # Ensuring alias is propagated properly
+      - echo "Adding delay to ensure alias update propagates..."
+      - sleep 60  # Ensure Lambda alias is fully propagated before CodeDeploy
 
       - echo "Updating AppSpec file with STAGE and VERSION..."
       - export STAGE=$STAGE
