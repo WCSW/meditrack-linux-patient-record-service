@@ -2,7 +2,7 @@ version: 0.2
 
 env:
   variables:
-    SERVERLESS_ACCESS_KEY: "AKH0BPKbz2RQUgkNr4unbgVJqMJVCEtsq22E7ACnKVv8K"
+    SERVERLESS_ACCESS_KEY: "AKH0BPKbz2RQUgkNr4unbgVJqMJVCEtsq22E7ACnKVv8Z"
 
 phases:
   install:
