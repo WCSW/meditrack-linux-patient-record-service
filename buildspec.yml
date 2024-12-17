@@ -1,5 +1,9 @@
 version: 0.2
 
+env:
+  variables:
+    SERVERLESS_ACCESS_KEY: "AKH0BPKbz2RQUgkNr4unbgVJqMJVCEtsq22E7ACnKVv8Z"  # Replace with the actual Serverless access key
+
 phases:
   install:
     runtime-versions:
@@ -10,25 +14,25 @@ phases:
       - echo "Verifying Node.js and npm versions:"
       - node -v && npm -v
       - echo "============================================="
-      - echo "Cleaning npm cache to avoid archive issues..."
+      - echo "Clearing NPM cache to avoid archive issues..."
       - npm cache clean --force
-      - echo "Installing a compatible npm version (npm v10)..."
-      - npm install -g npm@10.7.0
       - echo "Installing Serverless Framework..."
-      - npm install -g serverless
+      - npm install -g serverless@3.38.0
       - echo "Serverless Framework installed successfully!"
       - serverless --version
+
   build:
     commands:
       - echo "============================================="
       - echo "DEBUG - Checking STAGE environment variable..."
       - echo "STAGE value is - '$STAGE'"
       - echo "============================================="
+      - echo "Authenticating Serverless Framework using access key..."
+      - export SERVERLESS_ACCESS_KEY=${SERVERLESS_ACCESS_KEY}
       - echo "Zipping the Lambda function code..."
       - cd src && zip -r ../patient_record_service.zip . && cd ..
       - echo "---------------------------------------------"
-      - echo "Deploying to AWS Lambda using Serverless..."
-      - serverless login
+      - echo "Deploying to AWS Lambda using Serverless Framework..."
       - serverless deploy --stage $STAGE
       - echo "---------------------------------------------"
       - echo "Publishing Lambda function version..."
