@@ -5,17 +5,18 @@ phases:
     runtime-versions:
       python: 3.11
       nodejs: 18  # Use Node.js 18 directly
-      commands:
-        - echo "============================================="
-        - echo "Verifying Node.js and npm versions:"
-        - node -v && npm -v
-        - echo "============================================="
-        - echo "Clearing NPM cache to avoid archive issues..."
-        - npm cache clean --force
-        - echo "Installing Serverless Framework..."
-        - npm install -g serverless@3.38.0 || npm install -g serverless@3.38.0
-        - echo "Serverless Framework installed successfully!"
-        - serverless --version
+    commands:
+      - echo "============================================="
+      - echo "Verifying Node.js and npm versions:"
+      - node -v && npm -v
+      - echo "============================================="
+      - echo "Clearing NPM cache to avoid archive issues..."
+      - npm cache clean --force
+      - echo "Installing Serverless Framework..."
+      - npm install -g serverless@3.38.0 || npm install -g serverless@3.38.0
+      - echo "Serverless Framework installed successfully!"
+      - serverless --version
+      -
   build:
     commands:
       - echo "============================================="
