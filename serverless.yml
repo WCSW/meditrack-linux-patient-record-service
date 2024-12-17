@@ -6,7 +6,7 @@ provider:
   region: ap-south-1                 # AWS region (e.g., Mumbai)
   stage: ${opt:stage, 'dev'}         # Stage dynamically set (default: 'dev')
   deploymentBucket:                  # (Optional) Use a custom deployment bucket
-    name: my-patient-record-service-pipeline-artifacts
+    name: patient-record-service-deployments
   environment:                       # Environment variables for Lambda
     STAGE: ${opt:stage, 'dev'}       # Pass stage value to Lambda environment
 
