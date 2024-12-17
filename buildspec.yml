@@ -28,7 +28,7 @@ phases:
       - cd src && zip -r ../patient_record_service.zip . && cd ..
       - echo "---------------------------------------------"
       - echo "Deploying to AWS Lambda using Serverless..."
-      - Serverless login
+      - serverless login
       - serverless deploy --stage $STAGE
       - echo "---------------------------------------------"
       - echo "Publishing Lambda function version..."
