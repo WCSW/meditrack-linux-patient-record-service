@@ -10,12 +10,11 @@ phases:
       - echo "Verifying Node.js and npm versions:"
       - node -v && npm -v
       - echo "============================================="
-      - echo "Clearing NPM cache to avoid archive issues..."
-      - npm cache clean --force
       - echo "Installing Serverless Framework..."
-      - npm install serverless@3.38.0 --save-exact
+      - npm config set unsafe-perm true
+      - npm install -g serverless@3.38.0
       - echo "Serverless Framework installed successfully!"
-      - npx serverless --version
+      - serverless --version
 
   build:
     commands:
@@ -29,7 +28,7 @@ phases:
       - cd src && zip -r ../patient_record_service.zip . && cd ..
       - echo "---------------------------------------------"
       - echo "Deploying to AWS Lambda using Serverless..."
-      - npx serverless deploy --stage $STAGE
+      - serverless deploy --stage $STAGE
       - echo "---------------------------------------------"
       - echo "Publishing Lambda function version..."
       - LAMBDA_VERSION=$(aws lambda publish-version \
