@@ -7,40 +7,34 @@ phases:
     commands:
       - echo "Installing dependencies..."
       - pip install -r requirements.txt -t src/
+      - echo "Installing Serverless Framework..."
+      - npm install -g serverless
 
   build:
     commands:
-      - echo "Packaging Lambda function..."
-      - cd src && zip -r ../patient_record_service.zip .
-      - cd ..
-      - echo "Checking if Lambda function exists..."
+      - echo "============================================="
+      - echo "DEBUG - Checking STAGE environment variable..."
       - echo "STAGE value is - '$STAGE'"
-      # Check if Lambda function exists
-      - |
-        if aws lambda get-function --function-name patient-record-service-$STAGE; then
-          echo "Lambda function exists. Updating function code..."
-        else
-          echo "Lambda function does not exist. Creating function..."
-          aws lambda create-function \
-            --function-name patient-record-service-$STAGE \
-            --runtime python3.11 \
-            --role arn:aws:iam::183295424046:role/lambda-execution-role \
-            --handler patient_record_service.lambda_handler \
-            --zip-file fileb://patient_record_service.zip
-        fi
-
-      # Update function code if it already exists
-      - aws lambda update-function-code --function-name patient-record-service-$STAGE --zip-file fileb://patient_record_service.zip
-
-      # Publish a new version of the Lambda function
-      - LAMBDA_VERSION=$(aws lambda publish-version --function-name patient-record-service-$STAGE --query Version --output text)
+      - echo "============================================="
+      - echo "Zipping the Lambda function code..."
+      - cd src && zip -r ../patient_record_service.zip . && cd ..
+      - echo "---------------------------------------------"
+      - echo "Deploying to AWS Lambda using Serverless..."
+      - serverless deploy --stage $STAGE
+      - echo "---------------------------------------------"
+      - echo "Publishing Lambda function version..."
+      - LAMBDA_VERSION=$(aws lambda publish-version \
+          --function-name patient-record-service-$STAGE \
+          --query Version \
+          --output text)
       - echo "Published Lambda Version - $LAMBDA_VERSION"
-
-      # Replace placeholders in appspec.yml
+      - echo "============================================="
+      - echo "Updating AppSpec file with STAGE and VERSION..."
       - sed "s/\${STAGE}/$STAGE/g; s/\${VERSION}/$LAMBDA_VERSION/g" appspec.yml > appspec-resolved.yml
       - mv appspec-resolved.yml appspec.yml
-      - echo "Final appspec.yml:"
+      - echo "Final appspec.yml file content:"
       - cat appspec.yml
+      - echo "Build stage completed successfully."
 
 artifacts:
   files:
