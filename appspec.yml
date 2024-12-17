@@ -3,6 +3,9 @@ Resources:
   - PatientRecordService:
       Type: AWS::Lambda::Function
       Properties:
-        Name: patient-record-service-${STAGE}
-        Alias: ${STAGE}
-        CurrentVersion: ${VERSION}
+        Name: "patient-record-service-${STAGE}"
+        Alias: "${STAGE}"
+        CurrentVersion: "${VERSION}"
+Hooks:
+  - BeforeAllowTraffic: "LambdaFunctionToValidateBeforeTrafficShift"
+  - AfterAllowTraffic: "LambdaFunctionToValidateAfterTrafficShift"
