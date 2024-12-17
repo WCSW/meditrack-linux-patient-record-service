@@ -4,53 +4,48 @@ phases:
   install:
     runtime-versions:
       python: 3.11
-      nodejs: 18
+      nodejs: 18  # Use Node.js 18 directly
     commands:
-      - echo "Verifying Node.js version:"
-      - node -v
-      - echo "Installing yarn..."
-      - npm install -g yarn
-      - yarn --version
-      - echo "Creating package.json file..."
-      - |
-        cat << EOF > package.json
-        {
-          "name": "patient-record-service",
-          "version": "1.0.0",
-          "description": "Patient Record Service",
-          "dependencies": {
-            "serverless": "3.38.0",
-            "serverless-deployment-bucket": "^1.6.0"
-          }
-        }
-        EOF
-      - echo "Installing project dependencies..."
-      - yarn install --no-lockfile
-
+      - echo "============================================="
+      - echo "Verifying Node.js and npm versions:"
+      - node -v && npm -v
+      - echo "============================================="
+      - echo "Cleaning npm cache to resolve archive issues..."
+      - npm cache clean --force
+      - echo "Installing a specific npm version (latest stable)..."
+      - npm install -g npm@latest
+      - echo "Installing Serverless Framework..."
+      - npm install -g serverless@3.38.0
+      - echo "Serverless Framework installed successfully!"
+      - serverless --version
   build:
     commands:
+      - echo "============================================="
       - echo "DEBUG - Checking STAGE environment variable..."
       - echo "STAGE value is - '$STAGE'"
-      - echo "Installing Python dependencies..."
-      - pip install -r requirements.txt -t src/
+      - echo "============================================="
       - echo "Zipping the Lambda function code..."
       - cd src && zip -r ../patient_record_service.zip . && cd ..
+      - echo "---------------------------------------------"
       - echo "Deploying to AWS Lambda using Serverless..."
-      - yarn serverless deploy --stage $STAGE
+      - serverless deploy --stage $STAGE
+      - echo "---------------------------------------------"
       - echo "Publishing Lambda function version..."
       - LAMBDA_VERSION=$(aws lambda publish-version \
           --function-name patient-record-service-$STAGE \
           --query Version \
           --output text)
       - echo "Published Lambda Version - $LAMBDA_VERSION"
+      - echo "============================================="
       - echo "Updating AppSpec file with STAGE and VERSION..."
-      - sed -i "s/\${STAGE}/$STAGE/g; s/\${VERSION}/$LAMBDA_VERSION/g" appspec.yml
+      - sed "s/\${STAGE}/$STAGE/g; s/\${VERSION}/$LAMBDA_VERSION/g" appspec.yml > appspec-resolved.yml
+      - mv appspec-resolved.yml appspec.yml
       - echo "Final appspec.yml file content:"
       - cat appspec.yml
+      - echo "Build stage completed successfully."
 
 artifacts:
   files:
     - appspec.yml
     - patient_record_service.zip
   discard-paths: yes
-
