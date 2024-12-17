@@ -4,13 +4,20 @@ phases:
   install:
     runtime-versions:
       python: 3.11
-      nodejs: 18   # Add Node.js version to enable npm
     commands:
-      - echo "Installing dependencies..."
-      - pip install -r requirements.txt -t src/
-      - echo "Installing Serverless Framework..."
+      - echo "============================================="
+      - echo "Installing Node.js LTS version..."
+      - curl -fsSL https://rpm.nodesource.com/setup_18.x | bash -  # Install Node.js 18.x LTS
+      - yum install -y nodejs
+      - echo "Verifying Node.js and npm versions:"
+      - node -v
+      - npm -v
+      - echo "============================================="
+      - echo "Clearing NPM cache to avoid archive issues..."
+      - npm cache clean --force
+      - echo "Installing Serverless Framework v3.38.0..."
       - npm install -g serverless@3.38.0
-
+      - echo "============================================="
   build:
     commands:
       - echo "============================================="
