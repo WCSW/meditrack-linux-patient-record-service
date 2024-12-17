@@ -9,7 +9,7 @@ phases:
       - echo "Installing dependencies..."
       - pip install -r requirements.txt -t src/
       - echo "Installing Serverless Framework..."
-      - npm install -g serverless
+      - npm install -g serverless@3.38.0
 
   build:
     commands:
