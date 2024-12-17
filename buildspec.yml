@@ -15,7 +15,7 @@ phases:
       - echo "Installing a compatible npm version (npm v10)..."
       - npm install -g npm@10.7.0
       - echo "Installing Serverless Framework..."
-      - npm install -g serverless@3.38.0
+      - npm install -g serverless
       - echo "Serverless Framework installed successfully!"
       - serverless --version
   build:
@@ -28,6 +28,7 @@ phases:
       - cd src && zip -r ../patient_record_service.zip . && cd ..
       - echo "---------------------------------------------"
       - echo "Deploying to AWS Lambda using Serverless..."
+      - Serverless login
       - serverless deploy --stage $STAGE
       - echo "---------------------------------------------"
       - echo "Publishing Lambda function version..."
