@@ -34,4 +34,10 @@ plugins:
   - serverless-deployment-bucket      # Plugin for managing deployment bucket (optional)
 
 custom:
-  deploymentBucket: patient-record-service-deployments  # Custom bucket name
+  deploymentBucket:
+    name: patient-record-service-deployments  # Custom bucket name
+    versioning: true                         # Optional: Enable versioning for the bucket
+    accelerate: false                        # Optional: Disable transfer acceleration
+    tags:                                    # Optional: Add tags to the bucket
+      Environment: ${self:provider.stage}
+      Project: patient-record-service
