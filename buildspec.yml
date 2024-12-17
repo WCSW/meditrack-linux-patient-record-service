@@ -13,19 +13,30 @@ phases:
       - echo "Packaging Lambda function..."
       - cd src && zip -r ../patient_record_service.zip .
       - cd ..
-      - echo "Checking STAGE environment variable..."
-      - echo "STAGE value is '$STAGE'"
-      - echo "Listing files to ensure ZIP exists..."
-      - ls -la
-      - echo "Publishing Lambda function version..."
-      - aws lambda update-function-code --function-name patient-record-service-$STAGE --zip-file fileb://patient_record_service.zip
+      - echo "Checking if Lambda function exists..."
+      - echo "STAGE value is - '$STAGE'"
+      # Check if Lambda function exists
       - |
-        LAMBDA_VERSION=$(aws lambda publish-version \
-          --function-name patient-record-service-$STAGE \
-          --query Version \
-          --output text)
+        if aws lambda get-function --function-name patient-record-service-$STAGE; then
+          echo "Lambda function exists. Updating function code..."
+        else
+          echo "Lambda function does not exist. Creating function..."
+          aws lambda create-function \
+            --function-name patient-record-service-$STAGE \
+            --runtime python3.11 \
+            --role arn:aws:iam::183295424046:role/lambda-execution-role \
+            --handler patient_record_service.lambda_handler \
+            --zip-file fileb://patient_record_service.zip
+        fi
+
+      # Update function code if it already exists
+      - aws lambda update-function-code --function-name patient-record-service-$STAGE --zip-file fileb://patient_record_service.zip
+
+      # Publish a new version of the Lambda function
+      - LAMBDA_VERSION=$(aws lambda publish-version --function-name patient-record-service-$STAGE --query Version --output text)
       - echo "Published Lambda Version - $LAMBDA_VERSION"
-      - echo "Replacing STAGE and VERSION in appspec.yml..."
+
+      # Replace placeholders in appspec.yml
       - sed "s/\${STAGE}/$STAGE/g; s/\${VERSION}/$LAMBDA_VERSION/g" appspec.yml > appspec-resolved.yml
       - mv appspec-resolved.yml appspec.yml
       - echo "Final appspec.yml:"
