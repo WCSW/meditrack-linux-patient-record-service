@@ -6,41 +6,31 @@ phases:
       python: 3.11
       nodejs: 18
     commands:
-      - echo "============================================="
       - echo "Verifying Node.js and npm versions:"
       - node -v && npm -v
-      - echo "============================================="
-      - echo "Installing Serverless Framework..."
-      - npm install -g serverless@3.38.0
-      - echo "Serverless Framework installed successfully!"
-      - serverless --version
+      - echo "Installing project dependencies..."
+      - npm ci
 
   build:
     commands:
-      - echo "============================================="
       - echo "DEBUG - Checking STAGE environment variable..."
       - echo "STAGE value is - '$STAGE'"
-      - echo "============================================="
       - echo "Installing Python dependencies..."
       - pip install -r requirements.txt -t src/
       - echo "Zipping the Lambda function code..."
       - cd src && zip -r ../patient_record_service.zip . && cd ..
-      - echo "---------------------------------------------"
       - echo "Deploying to AWS Lambda using Serverless..."
-      - serverless deploy --stage $STAGE
-      - echo "---------------------------------------------"
+      - npx serverless deploy --stage $STAGE
       - echo "Publishing Lambda function version..."
       - LAMBDA_VERSION=$(aws lambda publish-version \
           --function-name patient-record-service-$STAGE \
           --query Version \
           --output text)
       - echo "Published Lambda Version - $LAMBDA_VERSION"
-      - echo "============================================="
       - echo "Updating AppSpec file with STAGE and VERSION..."
       - sed -i "s/\${STAGE}/$STAGE/g; s/\${VERSION}/$LAMBDA_VERSION/g" appspec.yml
       - echo "Final appspec.yml file content:"
       - cat appspec.yml
-      - echo "Build stage completed successfully."
 
 artifacts:
   files:

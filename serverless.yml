@@ -30,8 +30,8 @@ package:
     - "tests/**"
     - "*.md"
 
-plugins:
-  - serverless-deployment-bucket
-
 custom:
   deploymentBucket: patient-record-service-deployments-${self:provider.stage}
+
+plugins:
+  - serverless-deployment-bucket
