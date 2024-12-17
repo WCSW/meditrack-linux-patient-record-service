@@ -21,6 +21,8 @@ phases:
       - npm install serverless-deployment-bucket
       - serverless --version
       - echo "============================================="
+      - echo "Installing envsubst for placeholder replacement..."
+      - yum install -y gettext
 
   build:
     commands:
@@ -45,7 +47,9 @@ phases:
       - echo "Lambda alias '$STAGE' updated to version - $LAMBDA_VERSION"
 
       - echo "Updating AppSpec file with STAGE and VERSION..."
-      - sed "s/\${STAGE}/$STAGE/g; s/\${VERSION}/$LAMBDA_VERSION/g" appspec.yml | tr -d '\r' | tr -d '\u00A0' | sed 's/[[:space:]]\{2,\}/ /g' > appspec-resolved.yml
+      - export STAGE=$STAGE
+      - export VERSION=$LAMBDA_VERSION
+      - envsubst < appspec.yml > appspec-resolved.yml
       - mv appspec-resolved.yml appspec.yml
       - echo "Updated AppSpec.yml:"
       - cat appspec.yml
