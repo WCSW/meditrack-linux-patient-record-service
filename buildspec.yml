@@ -7,11 +7,12 @@ phases:
       commands:
         - echo "============================================="
         - echo "Installing Node.js via NVM for reliability..."
-        - curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
-        - export NVM_DIR="$HOME/.nvm"
-        - . "$NVM_DIR/nvm.sh"
-        - nvm install 18
-        - nvm use 18
+        - |
+          curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
+          export NVM_DIR="$HOME/.nvm"
+          [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+          nvm install 18
+          nvm use 18
         - echo "Verifying Node.js and npm versions:"
         - node -v
         - npm -v
