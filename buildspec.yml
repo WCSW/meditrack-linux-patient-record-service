@@ -21,8 +21,11 @@ phases:
           }
         }
         EOF
+      - echo "Clearing npm cache and setting registry..."
+      - npm cache clean --force
+      - npm config set registry https://registry.npmjs.org/
       - echo "Installing project dependencies..."
-      - npm install
+      - npm install --no-package-lock
 
   build:
     commands:
