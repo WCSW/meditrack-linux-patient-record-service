@@ -13,9 +13,18 @@ phases:
       - echo "Packaging Lambda function..."
       - cd src && zip -r ../patient_record_service.zip .
       - cd ..
+      - echo "Checking STAGE environment variable..."
+      - echo "STAGE value is '$STAGE'"
+      - echo "Listing files to ensure ZIP exists..."
+      - ls -la
       - echo "Publishing Lambda function version..."
       - aws lambda update-function-code --function-name patient-record-service-$STAGE --zip-file fileb://patient_record_service.zip
-      - LAMBDA_VERSION=$(aws lambda publish-version --function-name patient-record-service-$STAGE --query Version --output text)
+      - |
+        LAMBDA_VERSION=$(aws lambda publish-version \
+          --function-name patient-record-service-$STAGE \
+          --query Version \
+          --output text)
+      - echo "Published Lambda Version - $LAMBDA_VERSION"
       - echo "Replacing STAGE and VERSION in appspec.yml..."
       - sed "s/\${STAGE}/$STAGE/g; s/\${VERSION}/$LAMBDA_VERSION/g" appspec.yml > appspec-resolved.yml
       - mv appspec-resolved.yml appspec.yml
