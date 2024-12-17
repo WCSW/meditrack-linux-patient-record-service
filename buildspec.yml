@@ -18,8 +18,8 @@ phases:
       - npm cache clean --force
       - echo "Installing Serverless Framework..."
       - npm install -g serverless
-      - echo "Installing Serverless Deployment Bucket Plugin..."
-      - npm install -g serverless-deployment-bucket
+      - echo "Installing Serverless Deployment Bucket Plugin locally..."
+      - npm install serverless-deployment-bucket
       - echo "Serverless Framework and required plugin installed successfully!"
       - serverless --version
 
