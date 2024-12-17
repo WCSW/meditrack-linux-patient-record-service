@@ -5,14 +5,22 @@ phases:
     runtime-versions:
       python: 3.11
       commands:
-        - echo "============================================="
-        - echo "Installing Node.js via NVM for reliability..."
-        - curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash && export NVM_DIR="$HOME/.nvm" && [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh" && nvm install 18 && nvm use 18
-        - echo "Verifying Node.js and npm versions:" && node -v && npm -v
-        - echo "============================================="
-        - echo "Clearing NPM cache to avoid archive issues..." && npm cache clean --force
-        - echo "Retrying installation of Serverless Framework..." && npm install -g serverless@3.38.0 || npm install -g serverless@3.38.0
-        - echo "Serverless Framework installed successfully!" && serverless --version
+        - "echo ============================================="
+        - "echo Installing Node.js via NVM for reliability..."
+        - "curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash"
+        - "export NVM_DIR=\"$HOME/.nvm\" && [ -s \"$NVM_DIR/nvm.sh\" ] && . \"$NVM_DIR/nvm.sh\""
+        - "nvm install 18 && nvm use 18"
+        - "echo Installing npm explicitly..."
+        - "npm install -g npm"
+        - "echo Verifying Node.js and npm versions:"
+        - "node -v && npm -v"
+        - "echo ============================================="
+        - "echo Clearing NPM cache to avoid archive issues..."
+        - "npm cache clean --force"
+        - "echo Installing Serverless Framework..."
+        - "npm install -g serverless@3.38.0 || npm install -g serverless@3.38.0"
+        - "echo Serverless Framework installed successfully!"
+        - "serverless --version"
   build:
     commands:
       - echo "============================================="
