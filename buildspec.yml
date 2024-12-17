@@ -28,6 +28,7 @@ phases:
     commands:
       - echo "DEBUG - Checking STAGE variable - '$STAGE'"
       - export SERVERLESS_ACCESS_KEY=${SERVERLESS_ACCESS_KEY}
+
       - echo "Zipping the Lambda function..."
       - cd src && zip -r ../patient_record_service.zip . && cd ..
 
@@ -41,6 +42,11 @@ phases:
           exit 1;
         fi
       - echo "Lambda version published - $LAMBDA_VERSION"
+
+      - echo "Verifying Lambda function version..."
+      - aws lambda list-versions-by-function --function-name patient-record-service-$STAGE
+      - echo "Adding delay to ensure version availability..."
+      - sleep 10
 
       - echo "Creating/Updating Lambda alias..."
       - aws lambda update-alias --function-name patient-record-service-$STAGE --name $STAGE --function-version $LAMBDA_VERSION || aws lambda create-alias --function-name patient-record-service-$STAGE --name $STAGE --function-version $LAMBDA_VERSION
