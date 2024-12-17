@@ -2,7 +2,7 @@ version: 0.2
 
 env:
   variables:
-    SERVERLESS_ACCESS_KEY: "AKH0BPKbz2RQUgkNr4unbgVJqMJVCEtsq22E7ACnKVv8Z"  # Replace with the actual Serverless access key
+    SERVERLESS_ACCESS_KEY: "AKH0BPKbz2RQUgkNr4unbgVJqMJVCEtsq22E7ACnKVv8Z"
 
 phases:
   install:
@@ -46,11 +46,14 @@ phases:
       - echo "Verifying Lambda function version..."
       - aws lambda list-versions-by-function --function-name patient-record-service-$STAGE
       - echo "Adding delay to ensure version availability..."
-      - sleep 10
+      - sleep 20
 
       - echo "Creating/Updating Lambda alias..."
       - aws lambda update-alias --function-name patient-record-service-$STAGE --name $STAGE --function-version $LAMBDA_VERSION || aws lambda create-alias --function-name patient-record-service-$STAGE --name $STAGE --function-version $LAMBDA_VERSION
       - echo "Lambda alias '$STAGE' updated to version - $LAMBDA_VERSION"
+
+      - echo "Adding delay before proceeding with AppSpec update..."
+      - sleep 20  # Ensuring alias is propagated properly
 
       - echo "Updating AppSpec file with STAGE and VERSION..."
       - export STAGE=$STAGE
