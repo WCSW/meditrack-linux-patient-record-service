@@ -2,36 +2,36 @@ service: patient-record-service
 
 provider:
   name: aws
-  runtime: python3.11
-  region: ap-south-1
-  stage: ${opt:stage, 'dev'}
-  deploymentBucket:
-    name: ${self:custom.deploymentBucket}
-  environment:
-    STAGE: ${self:provider.stage}
+  runtime: python3.11                # Specify Python runtime
+  region: ap-south-1                 # AWS region (e.g., Mumbai)
+  stage: ${opt:stage, 'dev'}         # Stage dynamically set (default: 'dev')
+  deploymentBucket:                  # (Optional) Use a custom deployment bucket
+    name: my-patient-record-service-pipeline-artifacts
+  environment:                       # Environment variables for Lambda
+    STAGE: ${opt:stage, 'dev'}       # Pass stage value to Lambda environment
 
 functions:
   patientServiceHandler:
-    handler: patient_record_service.lambda_handler
-    name: patient-record-service-${self:provider.stage}
+    handler: patient_record_service.lambda_handler   # Lambda handler
+    name: patient-record-service-${self:provider.stage}  # Function name with stage
     description: "Patient Record Service Lambda for ${self:provider.stage} environment"
     events:
       - http:
           path: patient
           method: any
-          cors: true
+          cors: true                  # Enable CORS for API Gateway
 
 package:
-  individually: true
-  exclude:
+  individually: true                  # Package only the files needed for the function
+  exclude:                            # Exclude unnecessary files
     - "node_modules/**"
     - ".git/**"
     - "buildspec.yml"
     - "tests/**"
     - "*.md"
 
-custom:
-  deploymentBucket: patient-record-service-deployments-${self:provider.stage}
-
 plugins:
-  - serverless-deployment-bucket
+  - serverless-deployment-bucket      # Plugin for managing deployment bucket (optional)
+
+custom:
+  deploymentBucket: patient-record-service-deployments  # Custom bucket name
