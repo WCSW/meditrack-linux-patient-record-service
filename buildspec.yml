@@ -10,10 +10,10 @@ phases:
       - echo "Verifying Node.js and npm versions:"
       - node -v && npm -v
       - echo "============================================="
-      - echo "Cleaning npm cache to resolve archive issues..."
+      - echo "Cleaning npm cache to avoid archive issues..."
       - npm cache clean --force
-      - echo "Installing a specific npm version (latest stable)..."
-      - npm install -g npm@latest
+      - echo "Installing a compatible npm version (npm v10)..."
+      - npm install -g npm@10.7.0
       - echo "Installing Serverless Framework..."
       - npm install -g serverless@3.38.0
       - echo "Serverless Framework installed successfully!"
