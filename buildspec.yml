@@ -9,7 +9,7 @@ phases:
       - echo "Verifying Node.js and npm versions:"
       - node -v && npm -v
       - echo "Installing project dependencies..."
-      - npm ci
+      - npm install
 
   build:
     commands:
