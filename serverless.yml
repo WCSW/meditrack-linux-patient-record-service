@@ -36,7 +36,7 @@ plugins:
 custom:
   deploymentBucket:
     name: patient-record-service-deployments  # Custom bucket name
-    versioning: false                         # Optional: Enable versioning for the bucket
+    versioning: true                         # Optional: Enable versioning for the bucket
     accelerate: false                        # Optional: Disable transfer acceleration
     tags:                                    # Optional: Add tags to the bucket
       Environment: ${self:provider.stage}
