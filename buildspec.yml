@@ -33,7 +33,11 @@ phases:
       - serverless deploy --stage $STAGE
 
       - echo "Publishing Lambda function version..."
-      - LAMBDA_VERSION=$(aws lambda publish-version --function-name patient-record-service-$STAGE --query Version --output text)
+      - LAMBDA_VERSION=$(aws lambda publish-version --function-name patient-record-service-$STAGE --query Version --output text || echo "FAILED")
+      - if [ "$LAMBDA_VERSION" = "FAILED" ]; then
+          echo "ERROR - Failed to publish Lambda version. Exiting.";
+          exit 1;
+        fi
       - echo "Lambda version published - $LAMBDA_VERSION"
 
       - echo "Creating/Updating Lambda alias..."
