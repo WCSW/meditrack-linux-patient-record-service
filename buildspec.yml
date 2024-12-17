@@ -2,7 +2,7 @@ version: 0.2
 
 env:
   variables:
-    SERVERLESS_ACCESS_KEY: "AKH0BPKbz2RQUgkNr4unbgVJqMJVCEtsq22E7ACnKVv8K"
+    SERVERLESS_ACCESS_KEY: "AKH0BPKbz2RQUgkNr4unbgVJqMJVCEtsq22E7ACnKVv8Z"
 
 phases:
   install:
@@ -10,10 +10,18 @@ phases:
       python: 3.11
       nodejs: 18
     commands:
+      - echo "============================================="
+      - echo "Verifying Node.js and npm versions:"
+      - node -v && npm -v
+      - echo "Clearing NPM cache..."
+      - npm cache clean --force
       - echo "Installing Serverless Framework..."
       - npm install -g serverless
       - echo "Installing required plugins..."
       - npm install serverless-deployment-bucket
+      - serverless --version
+      - echo "============================================="
+      - echo "Installing envsubst for placeholder replacement..."
       - yum install -y gettext
 
   build:
