@@ -8,6 +8,19 @@ phases:
     commands:
       - echo "Verifying Node.js and npm versions:"
       - node -v && npm -v
+      - echo "Creating package.json file..."
+      - |
+        cat << EOF > package.json
+        {
+          "name": "patient-record-service",
+          "version": "1.0.0",
+          "description": "Patient Record Service",
+          "dependencies": {
+            "serverless": "3.38.0",
+            "serverless-deployment-bucket": "^1.6.0"
+          }
+        }
+        EOF
       - echo "Installing project dependencies..."
       - npm install
 
