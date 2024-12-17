@@ -6,8 +6,11 @@ phases:
       python: 3.11
       nodejs: 18
     commands:
-      - echo "Verifying Node.js and npm versions:"
-      - node -v && npm -v
+      - echo "Verifying Node.js version:"
+      - node -v
+      - echo "Installing yarn..."
+      - npm install -g yarn
+      - yarn --version
       - echo "Creating package.json file..."
       - |
         cat << EOF > package.json
@@ -21,11 +24,8 @@ phases:
           }
         }
         EOF
-      - echo "Clearing npm cache and setting registry..."
-      - npm cache clean --force
-      - npm config set registry https://registry.npmjs.org/
       - echo "Installing project dependencies..."
-      - npm install --no-package-lock
+      - yarn install --no-lockfile
 
   build:
     commands:
@@ -36,7 +36,7 @@ phases:
       - echo "Zipping the Lambda function code..."
       - cd src && zip -r ../patient_record_service.zip . && cd ..
       - echo "Deploying to AWS Lambda using Serverless..."
-      - npx serverless deploy --stage $STAGE
+      - yarn serverless deploy --stage $STAGE
       - echo "Publishing Lambda function version..."
       - LAMBDA_VERSION=$(aws lambda publish-version \
           --function-name patient-record-service-$STAGE \
@@ -53,3 +53,4 @@ artifacts:
     - appspec.yml
     - patient_record_service.zip
   discard-paths: yes
+
