@@ -27,7 +27,7 @@ spec:
             - name: DB_PORT
               value: "5432"  # Default PostgreSQL port
             - name: DB_NAME
-              value: "meditrack-db2"  # Your database name
+              value: "meditrack_db2"  # Your database name
             - name: DB_USER
               value: "postgres"  # Replace with your RDS username
             - name: DB_PASSWORD
