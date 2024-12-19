@@ -2,64 +2,32 @@ version: 0.2
 
 env:
   variables:
-    SERVERLESS_ACCESS_KEY: "AKH0BPKbz2RQUgkNr4unbgVJqMJVCEtsq22E7ACnKVv8Z"
+    DOCKER_USERNAME: "channa316"  # Docker Hub username
+    DOCKER_PASSWORD: "3ezvNbGcG8EhF$m"  # Docker Hub password
 
 phases:
   install:
     runtime-versions:
-      python: 3.11
-      nodejs: 18
+      docker: 20
     commands:
-      - echo "============================================="
-      - echo "Verifying Node.js and npm versions:"
-      - node -v && npm -v
-      - echo "Clearing NPM cache..."
-      - npm cache clean --force
-      - echo "Installing Serverless Framework..."
-      - npm install -g serverless
-      - echo "Installing required plugins..."
-      - npm install serverless-deployment-bucket
-      - serverless --version
-      - echo "============================================="
-      - echo "Installing envsubst for placeholder replacement..."
-      - yum install -y gettext
+      - echo "Logging in to Docker Hub..."
+      - echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
 
   build:
     commands:
-      - echo "DEBUG - Checking STAGE variable - '$STAGE'"
-      - export SERVERLESS_ACCESS_KEY=${SERVERLESS_ACCESS_KEY}
+      - echo "Building Docker image..."
+      - docker build -t $DOCKER_USERNAME/patient-record-service:latest .
+      - echo "Tagging Docker image with commit hash..."
+      - docker tag $DOCKER_USERNAME/patient-record-service:latest $DOCKER_USERNAME/patient-record-service:$CODEBUILD_RESOLVED_SOURCE_VERSION
 
-      - echo "Zipping the Lambda function..."
-      - cd src && zip -r ../patient_record_service.zip . && cd ..
-
-      - echo "Deploying Lambda with Serverless Framework..."
-      - serverless deploy --stage $STAGE
-
-      - echo "Publishing Lambda function version..."
-      - LAMBDA_VERSION=$(aws lambda publish-version --function-name patient-record-service-$STAGE --query Version --output text || echo "FAILED")
-      - if [ "$LAMBDA_VERSION" = "FAILED" ]; then
-          echo "ERROR - Failed to publish Lambda version. Exiting.";
-          exit 1;
-        fi
-      - echo "Lambda version published - $LAMBDA_VERSION"
-
-      - echo "Creating/Updating Lambda alias..."
-      - aws lambda update-alias --function-name patient-record-service-$STAGE --name $STAGE --function-version $LAMBDA_VERSION || aws lambda create-alias --function-name patient-record-service-$STAGE --name $STAGE --function-version $LAMBDA_VERSION
-      - echo "Lambda alias '$STAGE' updated to version - $LAMBDA_VERSION"
-
-      - echo "Adding delay to ensure alias update propagates..."
-      - sleep 60  # Ensure Lambda alias is fully propagated before CodeDeploy
-
-      - echo "Updating AppSpec file with STAGE and VERSION..."
-      - export STAGE=$STAGE
-      - export VERSION=$LAMBDA_VERSION
-      - envsubst < appspec.yml > appspec-resolved.yml
-      - mv appspec-resolved.yml appspec.yml
-      - echo "Updated AppSpec.yml:"
-      - cat appspec.yml
+  post_build:
+    commands:
+      - echo "Pushing Docker image to Docker Hub..."
+      - docker push $DOCKER_USERNAME/patient-record-service:latest
+      - docker push $DOCKER_USERNAME/patient-record-service:$CODEBUILD_RESOLVED_SOURCE_VERSION
+      - echo "Deploying to Kubernetes..."
+      - kubectl apply -f k8s-deployment.yml
 
 artifacts:
   files:
-    - appspec.yml
-    - patient_record_service.zip
-  discard-paths: yes
+    - k8s-deployment.yml

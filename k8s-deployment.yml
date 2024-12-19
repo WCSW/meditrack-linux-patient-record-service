@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: patient-record-service
+  labels:
+    app: patient-record-service
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: patient-record-service
+  template:
+    metadata:
+      labels:
+        app: patient-record-service
+    spec:
+      containers:
+        - name: patient-record-service
+          image: channa316/patient-record-service:latest
+          ports:
+            - containerPort: 5000
+          env:
+            - name: STAGE
+              value: "uat"  # Adjust based on environment
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: patient-record-service
+spec:
+  selector:
+    app: patient-record-service
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 5000
+  type: LoadBalancer
