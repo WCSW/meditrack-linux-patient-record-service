@@ -47,3 +47,4 @@ phases:
 artifacts:
   files:
     - k8s-deployment.yml
+    - deployspec.yml
