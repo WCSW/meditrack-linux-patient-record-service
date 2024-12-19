@@ -9,13 +9,14 @@ RUN apt-get update && apt-get install -y \
 # Set working directory
 WORKDIR /app
 
-# Copy application files
-COPY requirements.txt requirements.txt
-RUN pip install --no-cache-dir -r requirements.txt
-COPY . .
+# Copy application code
+COPY src/ /app
 
-# Expose the port the service will run on
+# Install dependencies
+RUN pip install --no-cache-dir -r /app/requirements.txt
+
+# Expose the application port
 EXPOSE 5000
 
-# Run the service
+# Command to run the application
 CMD ["python", "patient_record_service.py"]
