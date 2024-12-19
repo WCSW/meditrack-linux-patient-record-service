@@ -48,4 +48,4 @@ artifacts:
   files:
     - k8s-deployment.yml
     - deployspec.yml
-    - k8s/rbac.yml
+    - rbac.yml
