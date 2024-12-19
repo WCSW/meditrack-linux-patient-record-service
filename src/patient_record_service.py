@@ -6,7 +6,7 @@ app = Flask(__name__)
 # Database Configuration
 DB_CONFIG = {
     "host": "meditrack-db2.cloiwow0uz31.ap-south-1.rds.amazonaws.com",
-    "database": "meditrack-db2",
+    "database": "meditrack_db2",
     "user": "postgres",
     "password": "postgres2025"
 }
