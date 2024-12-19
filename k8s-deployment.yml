@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: patient-record-service
-          image: channa316/patient-record-service:latest
+          image: channa316/patient-record-service:latest  # This is dynamically updated
           ports:
             - containerPort: 5000
           env:
