@@ -1,54 +1,81 @@
+import psycopg2
 from flask import Flask, request, jsonify
 
 app = Flask(__name__)
 
-# Simulated in-memory database
-PATIENT_RECORDS = {}
+# Database Configuration
+DB_CONFIG = {
+    "host": "meditrack-db2.cloiwow0uz31.ap-south-1.rds.amazonaws.com",
+    "database": "meditrack-db2",
+    "user": "postgres",
+    "password": "postgres2025"
+}
+
+# Database Connection
+def get_db_connection():
+    conn = psycopg2.connect(**DB_CONFIG)
+    return conn
 
 @app.route("/patient", methods=["POST"])
 def create_patient():
     try:
         body = request.get_json()
-        patient_id = body["id"]
-        PATIENT_RECORDS[patient_id] = body
-        return jsonify({"message": "Patient created", "id": patient_id}), 201
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute(
+            "INSERT INTO patients (id, name, age, diagnosis ) VALUES (%s, %s, %s, %s)",
+            (body["id"], body["name"], body["age"], body["diagnosis"])
+        )
+        conn.commit()
+        cur.close()
+        conn.close()
+        return jsonify({"message": "Patient created", "id": body["id"]}), 201
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-@app.route("/patient", methods=["GET"])
-def get_patient():
+@app.route("/patient/<int:patient_id>", methods=["GET"])
+def get_patient(patient_id):
     try:
-        patient_id = request.args.get("id")
-        patient = PATIENT_RECORDS.get(patient_id)
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute("SELECT * FROM patients WHERE id = %s", (patient_id,))
+        patient = cur.fetchone()
+        cur.close()
+        conn.close()
         if patient:
-            return jsonify(patient), 200
+            return jsonify({"id": patient[0], "name": patient[1], "age": patient[2], "diagnosis": patient[3]}), 200
         else:
-            return jsonify({"message": "Patient not found"}), 404
+            return jsonify({"error": "Patient not found"}), 404
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-@app.route("/patient", methods=["PUT"])
-def update_patient():
+@app.route("/patient/<int:patient_id>", methods=["PUT"])
+def update_patient(patient_id):
     try:
         body = request.get_json()
-        patient_id = body["id"]
-        if patient_id in PATIENT_RECORDS:
-            PATIENT_RECORDS[patient_id] = body
-            return jsonify({"message": "Patient updated"}), 200
-        else:
-            return jsonify({"message": "Patient not found"}), 404
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute(
+            "UPDATE patients SET name = %s, age = %s, diagnosis = %s WHERE id = %s",
+            (body["name"], body["age"], body["diagnosis"], patient_id)
+        )
+        conn.commit()
+        cur.close()
+        conn.close()
+        return jsonify({"message": "Patient updated"}), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-@app.route("/patient", methods=["DELETE"])
-def delete_patient():
+@app.route("/patient/<int:patient_id>", methods=["DELETE"])
+def delete_patient(patient_id):
     try:
-        patient_id = request.args.get("id")
-        if patient_id in PATIENT_RECORDS:
-            del PATIENT_RECORDS[patient_id]
-            return jsonify({"message": "Patient deleted"}), 200
-        else:
-            return jsonify({"message": "Patient not found"}), 404
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute("DELETE FROM patients WHERE id = %s", (patient_id,))
+        conn.commit()
+        cur.close()
+        conn.close()
+        return jsonify({"message": "Patient deleted"}), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 

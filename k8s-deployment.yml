@@ -16,12 +16,23 @@ spec:
     spec:
       containers:
         - name: patient-record-service
-          image: channa316/patient-record-service:latest  # This is dynamically updated
+          image: channa316/patient-record-service:latest  # Dynamically updated
           ports:
             - containerPort: 5000
           env:
             - name: STAGE
               value: "uat"  # Adjust based on environment
+            - name: DB_HOST
+              value: "meditrack-db2.cloiwow0uz31.ap-south-1.rds.amazonaws.com"  # RDS Endpoint
+            - name: DB_PORT
+              value: "5432"  # Default PostgreSQL port
+            - name: DB_NAME
+              value: "meditrack-db2"  # Your database name
+            - name: DB_USER
+              value: "postgres"  # Replace with your RDS username
+            - name: DB_PASSWORD
+              value: "postgres2025"  # Replace with your RDS password
+
 ---
 apiVersion: v1
 kind: Service
