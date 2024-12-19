@@ -39,10 +39,10 @@ phases:
       - kubectl apply -f k8s/rbac.yml
       - echo "Updating deployment YAML with image tag..."
       - sed -i "s|channa316/patient-record-service:latest|channa316/patient-record-service:$CODEBUILD_RESOLVED_SOURCE_VERSION|g" k8s-deployment.yml
-      - echo "Applying Kubernetes manifests..."
-      - kubectl apply -f k8s-deployment.yml --validate=false
-      - echo "Verifying deployment..."
-      - kubectl rollout status deployment/patient-record-service
+#      - echo "Applying Kubernetes manifests..."
+#      - kubectl apply -f k8s-deployment.yml --validate=false
+#      - echo "Verifying deployment..."
+#      - kubectl rollout status deployment/patient-record-service
 
 artifacts:
   files:

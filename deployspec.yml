@@ -1,0 +1,42 @@
+version: 0.2
+
+env:
+  variables:
+    CLUSTER_NAME: "meditrack-cluster"
+    REGION: "ap-south-1"
+
+phases:
+  install:
+    commands:
+      - echo "Starting deployment setup..."
+      - echo "Installing kubectl..."
+      - curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+      - chmod +x kubectl
+      - mv kubectl /usr/local/bin/
+
+  pre_build:
+    commands:
+      - echo "Configuring kubectl for EKS..."
+      - aws eks update-kubeconfig --region $REGION --name $CLUSTER_NAME
+      - kubectl config view
+      - kubectl config current-context
+      - echo "Verifying EKS cluster connectivity..."
+      - kubectl get nodes
+
+  build:
+    commands:
+      - echo "Applying RBAC configuration..."
+      - kubectl apply -f k8s/rbac.yml
+      - echo "Updating Kubernetes manifests with new image tag..."
+      - sed -i "s|channa316/patient-record-service:latest|channa316/patient-record-service:$CODEBUILD_RESOLVED_SOURCE_VERSION|g" k8s-deployment.yml
+
+  post_build:
+    commands:
+      - echo "Applying Kubernetes manifests..."
+      - kubectl apply -f k8s-deployment.yml --validate=false
+      - echo "Verifying deployment rollout..."
+      - kubectl rollout status deployment/patient-record-service
+
+artifacts:
+  files:
+    - k8s-deployment.yml
