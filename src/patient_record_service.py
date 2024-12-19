@@ -1,51 +1,56 @@
-import json
+from flask import Flask, request, jsonify
+
+app = Flask(__name__)
 
 # Simulated in-memory database
 PATIENT_RECORDS = {}
 
-def lambda_handler(event, context):
+@app.route("/patient", methods=["POST"])
+def create_patient():
     try:
-        http_method = event.get("httpMethod")
-        if http_method == "POST":
-            return create_patient(event)
-        elif http_method == "GET":
-            return get_patient(event)
-        elif http_method == "PUT":
-            return update_patient(event)
-        elif http_method == "DELETE":
-            return delete_patient(event)
-        else:
-            return {"statusCode": 405, "body": json.dumps("Method Not Allowed")}
-    except Exception as e:
-        return {"statusCode": 500, "body": json.dumps(str(e))}
-
-def create_patient(event):
-    body = json.loads(event["body"])
-    patient_id = body["id"]
-    PATIENT_RECORDS[patient_id] = body
-    return {"statusCode": 201, "body": json.dumps({"message": "Patient created", "id": patient_id})}
-
-def get_patient(event):
-    patient_id = event["queryStringParameters"]["id"]
-    patient = PATIENT_RECORDS.get(patient_id)
-    if patient:
-        return {"statusCode": 200, "body": json.dumps(patient)}
-    else:
-        return {"statusCode": 404, "body": json.dumps({"message": "Patient not found"})}
-
-def update_patient(event):
-    body = json.loads(event["body"])
-    patient_id = body["id"]
-    if patient_id in PATIENT_RECORDS:
+        body = request.get_json()
+        patient_id = body["id"]
         PATIENT_RECORDS[patient_id] = body
-        return {"statusCode": 200, "body": json.dumps({"message": "Patient updated"})}
-    else:
-        return {"statusCode": 404, "body": json.dumps({"message": "Patient not found"})}
+        return jsonify({"message": "Patient created", "id": patient_id}), 201
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
-def delete_patient(event):
-    patient_id = event["queryStringParameters"]["id"]
-    if patient_id in PATIENT_RECORDS:
-        del PATIENT_RECORDS[patient_id]
-        return {"statusCode": 200, "body": json.dumps({"message": "Patient deleted"})}
-    else:
-        return {"statusCode": 404, "body": json.dumps({"message": "Patient not found"})}
+@app.route("/patient", methods=["GET"])
+def get_patient():
+    try:
+        patient_id = request.args.get("id")
+        patient = PATIENT_RECORDS.get(patient_id)
+        if patient:
+            return jsonify(patient), 200
+        else:
+            return jsonify({"message": "Patient not found"}), 404
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@app.route("/patient", methods=["PUT"])
+def update_patient():
+    try:
+        body = request.get_json()
+        patient_id = body["id"]
+        if patient_id in PATIENT_RECORDS:
+            PATIENT_RECORDS[patient_id] = body
+            return jsonify({"message": "Patient updated"}), 200
+        else:
+            return jsonify({"message": "Patient not found"}), 404
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@app.route("/patient", methods=["DELETE"])
+def delete_patient():
+    try:
+        patient_id = request.args.get("id")
+        if patient_id in PATIENT_RECORDS:
+            del PATIENT_RECORDS[patient_id]
+            return jsonify({"message": "Patient deleted"}), 200
+        else:
+            return jsonify({"message": "Patient not found"}), 404
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=5000)
