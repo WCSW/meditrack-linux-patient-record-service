@@ -1,8 +1,0 @@
-version: 0.0
-Resources:
-  - PatientRecordService:
-      Type: AWS::Lambda::Function
-      Properties:
-        Name: patient-record-service-${STAGE}
-        Alias: ${STAGE}
-        CurrentVersion: ${VERSION}
