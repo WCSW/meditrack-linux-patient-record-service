@@ -29,6 +29,9 @@ phases:
       - echo "Pushing Docker image to Docker Hub..."
       - docker push $DOCKER_USERNAME/patient-record-service:latest
       - docker push $DOCKER_USERNAME/patient-record-service:$CODEBUILD_RESOLVED_SOURCE_VERSION
+      - echo "Checking kubectl connectivity..."
+      - kubectl get nodes
+      - kubectl get pods
       - echo "Configuring kubectl for EKS..."
       - aws eks update-kubeconfig --region $REGION --name $CLUSTER_NAME
       - kubectl config current-context
